@@ -1,1 +1,1 @@
-# ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach
+# ISIC Challenge A Conventional Skin Lesion Classification Approach
