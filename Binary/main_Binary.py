@@ -28,8 +28,8 @@ def read_dataset(img_size, subset):
         image_files = os.listdir(images_path)
         total_images = len(image_files) * 2  # Calculate the total number of images to read
 
-        with tqdm(total=len(image_files), desc=f'Reading images {subset}...') as pbar:  # Initialize the progress bar
-            for file_name in image_files[0:5]:
+        with tqdm(total=len(image_files), desc=f'Reading images {subset} ({label})...') as pbar:  # Initialize the progress bar
+            for file_name in image_files[0:10]:
                 image = os.path.join(images_path, file_name)
                 img = cv.imread(image)
                 resized_img = cv.resize(img, img_size)
@@ -50,8 +50,7 @@ def extract_features(train, train_gt, subset):
         for i in range(len(train)):
             vec_features_train.append(features.extract_all(train[i]))
             vec_gt_train.append(train_gt[i])
-
-    pbar.update(1)  # Close the progress bar
+            pbar.update(1)  # Close the progress bar
 
     vec_features_train = pd.concat(vec_features_train)
     vec_gt_train_ = pd.Series(vec_gt_train)
@@ -70,13 +69,14 @@ def train_models(vec_features_train, vec_gt_train, vec_features_val, vec_gt_val)
 
     results = {}  # Dictionary to store results
     print("\n------------Results------------")
+    all_predictions=[]
     for name, classifier in classifiers:
         # Train the classifier
         classifier.fit(vec_features_train, vec_gt_train.ravel())
 
         # Make predictions on the validation set
         predictions = classifier.predict(vec_features_val)
-
+        all_predictions.append(predictions)
         # Calculate accuracy
         accuracy = accuracy_score(np.array(vec_gt_val).ravel(), predictions)
 
@@ -85,6 +85,11 @@ def train_models(vec_features_train, vec_gt_train, vec_features_val, vec_gt_val)
 
         print(f"{name} Accuracy:", accuracy)
 
+    # We do Voting with all the previous models
+    summed_vector = [sum(vector[i] for vector in all_predictions) for i in range(len(all_predictions[0]))]
+    voting=np.where(np.array(summed_vector)>1,1,0)
+    accuracy = accuracy_score(np.array(vec_gt_val).ravel(), voting)
+    print(f"Voting Accuracy:", accuracy)
 
 
 # Function to normalize features using Min-Max scaling
@@ -110,6 +115,8 @@ if __name__ == "__main__":
 
     # Extract features from the training dataset
     vec_features_train, vec_gt_train = extract_features(train, train_gt, subset='train')
+    vec_features_train.to_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/features_train.csv', index=False)  # Set index=False to exclude the index column
+    pd.Series(vec_gt_train).to_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/gt_train.csv', index=False)  # Set index=False to exclude the index column
 
     # Extract features from the validation dataset
     vec_features_val, vec_gt_val = extract_features(val, val_gt, subset='val')
