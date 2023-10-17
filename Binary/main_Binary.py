@@ -29,7 +29,7 @@ def read_dataset(img_size, subset):
         total_images = len(image_files) * 2  # Calculate the total number of images to read
 
         with tqdm(total=len(image_files), desc=f'Reading images {subset} ({label})...') as pbar:  # Initialize the progress bar
-            for file_name in image_files[0:10]:
+            for file_name in image_files:
                 image = os.path.join(images_path, file_name)
                 img = cv.imread(image)
                 resized_img = cv.resize(img, img_size)
@@ -63,7 +63,7 @@ def train_models(vec_features_train, vec_gt_train, vec_features_val, vec_gt_val)
     # Initialize classifiers
     classifiers = [
         ('SVM', SVC(kernel='linear')),
-        ('Random Forest', RandomForestClassifier(n_estimators=100)),
+        ('Random Forest', RandomForestClassifier(max_iter=200)),
         ('Logistic Regression', LogisticRegression())
     ]
 
@@ -115,11 +115,13 @@ if __name__ == "__main__":
 
     # Extract features from the training dataset
     vec_features_train, vec_gt_train = extract_features(train, train_gt, subset='train')
-    vec_features_train.to_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/features_train.csv', index=False)  # Set index=False to exclude the index column
+    """vec_features_train.to_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/features_train.csv', index=False)  # Set index=False to exclude the index column
     pd.Series(vec_gt_train).to_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/gt_train.csv', index=False)  # Set index=False to exclude the index column
-
+    """
     # Extract features from the validation dataset
     vec_features_val, vec_gt_val = extract_features(val, val_gt, subset='val')
-
+    """vec_features_val.to_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/features_val.csv',index=False)  # Set index=False to exclude the index column
+    pd.Series(vec_gt_val).to_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/gt_val.csv',index=False)  # Set index=False to exclude the index column
+    """
     # Train the SVM model
     train_models(normalise_features(vec_features_train), vec_gt_train, normalise_features(vec_features_val), vec_gt_val)
