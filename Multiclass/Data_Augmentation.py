@@ -36,6 +36,7 @@ class DataAugmentation:
         vec_gt = list(vec_gt)
         final_vec=[]
         final_gt_vec = []
+
         i = 0
         while i < images_to_augment:
             # Augment the original image and add it to the list
