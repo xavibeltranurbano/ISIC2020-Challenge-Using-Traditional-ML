@@ -37,16 +37,19 @@ class DataAugmentation:
         vec_img = list(vec_img)
         vec_gt = list(vec_gt)
 
+        final_vec=[]
+        final_gt_vec = []
+        augment_number=(desired_number_images-len(vec_img))
         i = 0
-        while len(vec_img) < desired_number_images:
+        while i < augment_number:
             # Augment the original image and add it to the list
-            img_augmented = self.datagen.flow(np.expand_dims(vec_img[i % len(vec_img)], axis=0), batch_size=1)
-            vec_img.append(img_augmented)
-            vec_gt.append(vec_gt[i % len(vec_img)])  # Use modulo to cycle through original images if necessary
-            print(i)
-            i += 1
+            value=random.randint(0,len(vec_img)-1)
+            img_augmented = next(self.datagen.flow(np.expand_dims(vec_img[value], axis=0), batch_size=1))
+            final_vec.append(img_augmented[0].astype(np.uint8))
+            final_gt_vec.append(vec_gt[value])
 
-        return vec_img, vec_gt
+            i += 1
+        return np.concatenate([vec_img,final_vec], axis=0), np.concatenate([vec_gt,final_gt_vec])
 
 
 
@@ -55,6 +58,7 @@ if __name__ == "__main__":
     # Load an image for feature extraction
     image_folder = "/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/train/nevus/nev00002.jpg"
     img = cv.imread(image_folder)
+    img=cv.cvtColor(img, cv.COLOR_BGR2RGB)
     vec_img=[]
     vec_img.append(img)
     vec_img.append(img)
@@ -64,7 +68,10 @@ if __name__ == "__main__":
     data_aug = DataAugmentation()
 
     # Extract and print color features
-    aug_img = data_aug.apply(vec_img,vec_gt,desired_number_images=20)
-    for img in aug_img:
-        plt.imshow(img)
+    aug_vec_img,aug_vec_gt = data_aug.apply(vec_img,vec_gt,desired_number_images=20)
+
+    print("PLOT IMAGES")
+    for i in range(aug_vec_img.shape[0]):
+        print(aug_vec_img[i].shape)
+        plt.imshow(aug_vec_img[i],cmap='gray')
         plt.show()
