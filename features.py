@@ -12,6 +12,7 @@ import pandas as pd
 from skimage.feature import local_binary_pattern
 from skimage.feature import graycomatrix, graycoprops
 from skimage.measure import shannon_entropy
+from sklearn.preprocessing import MinMaxScaler
 
 
 # Features Class
@@ -125,9 +126,18 @@ class Features:
         # Concatenate all texture features into a DataFrame
         return pd.concat([pd.DataFrame(lbp_vec_8_1), pd.DataFrame(lbp_vec_16_2), pd.DataFrame(glcm_vec)], axis=1)
 
+    def normalization(self):
+        scaler = MinMaxScaler()
+
+
     def extract_all(self, img):
         # Extract and concatenate all color and texture features
-        return pd.concat([self.color_features(img), self.texture_features(img)], axis=1)
+        features=pd.concat([self.color_features(img), self.texture_features(img)], axis=1)
+
+        # Normalize the data
+
+        normalized_features=self.normalization(features)
+        return normalized_features
 
 
 # Entry point of the script
