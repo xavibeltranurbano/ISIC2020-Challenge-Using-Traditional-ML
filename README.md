@@ -2,4 +2,4 @@
 
 Contributors:
 
-Muhammad Zain Amin, Xavi Beltran Urbano
+Xavi Beltran Urbano, Muhammad Zain Amin
