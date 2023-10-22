@@ -141,7 +141,7 @@ if __name__ == "__main__":
     vec_gt_train = []
     vec_features_val = []
     vec_gt_val = []
-
+    i=0
     for pyramid_level in levels:
         value = pyramid_level - 1
         # Define file paths with the current level
@@ -151,15 +151,17 @@ if __name__ == "__main__":
         val_gt_path = f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/features/gt_val_{pyramid_level}x{pyramid_level}.csv'
 
         # Read data from CSV files
-        vec_features_train.append(pd.read_csv(train_features_path).dropna(axis=1))
-        vec_gt_train.append(pd.read_csv(train_gt_path))
-        vec_features_val.append(pd.read_csv(val_features_path).dropna(axis=1))
-        vec_gt_val.append(pd.read_csv(val_gt_path))
+        vec_features_train.append(pd.read_csv(train_features_path).dropna(axis=1).add_suffix(f"{pyramid_level}x{pyramid_level}"))
+        vec_features_val.append(pd.read_csv(val_features_path).dropna(axis=1).add_suffix(f"{pyramid_level}x{pyramid_level}"))
+        if i==0:
+            vec_gt_train.append(pd.read_csv(train_gt_path))
+            vec_gt_val.append(pd.read_csv(val_gt_path))
+            i+=1
 
-    vec_features_train_ = pd.concat(vec_features_train)
-    vec_gt_train_ = pd.Series(np.concatenate(vec_gt_train, axis=0).ravel())
-    vec_features_val_ = pd.concat(vec_features_val)
-    vec_gt_val_ = pd.Series(np.concatenate(vec_gt_val, axis=0).ravel())
+    vec_features_train_ = pd.concat(vec_features_train,axis=1).reset_index(drop=True)
+    vec_gt_train_ = pd.Series(np.concatenate(vec_gt_train, axis=1).ravel())
+    vec_features_val_ = pd.concat(vec_features_val,axis=1).reset_index(drop=True)
+    vec_gt_val_ = pd.Series(np.concatenate(vec_gt_val, axis=1).ravel())
 
     print("THE FEATURES HAVE BEEN CONCATENATED")
     training = Training(vec_features_train_, vec_features_val_, vec_gt_train_, vec_gt_val_, cv=5)

@@ -9,6 +9,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 import xgboost as xgb
 import warnings
+from sklearn.metrics import confusion_matrix, classification_report
+
 class Training:
     def __init__(self,vec_train,vec_val, gt_train,gt_val,cv=2):
           self.cross_val=cv  # Number of folds
@@ -26,7 +28,7 @@ class Training:
     def Voting(self,all_predictions,vec_gt_val):
         # We do Voting with all the previous models
         summed_vector = [sum(vector[i] for vector in all_predictions) for i in range(len(all_predictions[0]))]
-        voting = np.where(np.array(summed_vector) > 1, 1, 0)
+        voting = np.where(np.array(summed_vector) > 0, 1, 0)
         accuracy = accuracy_score(np.array(vec_gt_val).ravel(), voting)
         return accuracy
 
@@ -60,6 +62,20 @@ class Training:
                   # Store the accuracy in the results dictionary
                   print(f" {name} Accuracy:", accuracy)
                   results[name].append(accuracy)
+
+                  # Calculate the confusion matrix
+                  confusion = confusion_matrix(np.array(y_val).ravel(), predictions)
+
+                  # Print the confusion matrix
+                  print("Confusion Matrix:")
+                  print(confusion)
+
+                  # Generate the entire classification report
+                  report = classification_report(np.array(y_val).ravel(), predictions)
+
+                  # Print the classification report
+                  print("\nClassification Report:")
+                  print(report)
 
               # We do Voting with all the previous models
               accuracy = self.Voting(all_predictions,y_val)
