@@ -40,12 +40,16 @@ class Training:
           self.thresholds=[] # We will store all the youden index
           self.type_training=type_training # Binary or Multiclass
 
-    def Voting(self,all_predictions,vec_gt_val):
-        # We do Voting with all the previous models
-        summed_vector = [sum(vector[i] for vector in all_predictions) for i in range(len(all_predictions[0]))]
+    def Voting(self, all_predictions, vec_gt_val):
+        # Sum the predictions for each sample across classifiers
+        summed_vector = np.sum(all_predictions, axis=0)
 
-        # Put 1 if the sum of the previous predictions is >1. Otherwise, put 0
-        voting = np.where(np.array(summed_vector) > 1, 1, 0)
+        if self.type_training == 'Binary':
+            # Threshold the summed predictions
+            voting = np.where(summed_vector > 1, 1, 0)
+        else:  # Multiclass
+            # The class label is the index with the maximum summed prediction
+            voting = np.argmax(summed_vector, axis=1)
 
         # Compute the accuracy of the voting
         accuracy = accuracy_score(np.array(vec_gt_val).ravel(), voting)
@@ -121,12 +125,14 @@ class Training:
     def train_classifier(self,classifier,X_train,y_train,X_val,y_val,all_predictions,name, results):
         # Train the classifier
         classifier.fit(X_train, np.array(y_train).ravel())
+        if self.type_training=='Binary':
+            # Make predictions on the validation set
+            prob_predictions = classifier.predict_proba(X_val)[:, 1]
+            # Binarize probabilities
+            predictions = self.binarizeProbabilities(prob_predictions, y_val)
+        else:
+            predictions = classifier.predict(X_val)
 
-        # Make predictions on the validation set
-        prob_predictions = classifier.predict_proba(X_val)[:, 1]
-
-        # Binarize probabilities
-        predictions = self.binarizeProbabilities(prob_predictions, y_val)
         all_predictions.append(predictions)
 
         # Compute metrics
