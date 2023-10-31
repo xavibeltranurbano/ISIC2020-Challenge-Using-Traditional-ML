@@ -1,12 +1,17 @@
+# -----------------------------------------------------------------------------
+# Feature Extraction Class
+# Author: Xavier Beltran Urbano and Zain Muhammad
+# Date Created: 31-10-2023
+# -----------------------------------------------------------------------------
+
+
 # Import necessary libraries
 import numpy as np
 import cv2 as cv
 import pandas as pd
 from skimage.feature import local_binary_pattern
 from skimage.feature import graycomatrix, graycoprops
-from skimage.measure import shannon_entropy
 import mahotas
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 
 

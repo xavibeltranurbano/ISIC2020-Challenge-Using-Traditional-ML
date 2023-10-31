@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 # Preprocessing Class
-# Author: Xavier Beltran Urbano
+# Author: Xavier Beltran Urbano and Zain Muhammad
 # Date Created: 17-10-2023
 # -----------------------------------------------------------------------------
 
@@ -234,6 +234,49 @@ class Preprocessing:
             # Plot results
             if plot_results:
               self._plot_results(img,image_file, hair_removed_image,roi_image,cn_hair_removed_image, segmented_image, cropped_mask_3_channels,final_image)
+
+            return final_image
+
+    def preprocess_image_ROI(self, img,image_file ,plot_results):
+            roi_image = self._roi(img)
+
+            # Apply Gaussian blur
+            kernel_size = (5, 5)  # Adjust the kernel size as needed
+            sigma_x = 0  # You can adjust the standard deviation if needed
+
+            # Apply Gaussian blur
+            img_blurred = cv.GaussianBlur(roi_image, kernel_size, sigma_x)
+            img_gray = cv.cvtColor(img_blurred, cv.COLOR_BGR2GRAY)
+
+            # Define the padding size (in pixels)
+            padding_size = 50  # Adjust this value as needed
+
+            # Apply padding
+            padding_image, height_original, width_original = self._add_padd_to_image(img_gray,padding_size)
+
+            # Region growing algorithm
+            seed = (0, 0)  # Seed point as a single tuple
+            segmented_image = segmentation.flood_fill(padding_image, seed_point=seed, new_value=0, tolerance=30)
+
+            # Apply the thresholding to create the binary mask
+            mask = np.where(segmented_image == 0, 255, 0).astype(np.uint8)
+
+            # Define the kernel for erosion
+            kernel_size = 11
+            kernel = np.ones((kernel_size, kernel_size), np.uint8)
+
+            # We remove small elements
+            mask = cv.dilate(cv.erode(mask, kernel, iterations=5), kernel, iterations=5)
+
+            # We dilate the mask
+            eroded_mask = cv.dilate(mask, kernel, iterations=5)
+
+            # Back to the original shape
+            cropped_mask = self._back_original_shape(eroded_mask, width_original, height_original,padding_size)
+
+            # Final output
+            cropped_mask_3_channels = cv.cvtColor(cropped_mask, cv.COLOR_GRAY2BGR)
+            final_image = 255 - (cropped_mask_3_channels * roi_image)
 
             return final_image
 
