@@ -12,7 +12,9 @@ from skimage import io, color, segmentation
 
 # Preprocessing Class
 class Preprocessing:
-
+    """
+       Preprocessing class. This class's purpose is to preprocess the images in the dataset.
+     """
     def _roi(self,img, threshold=50):
         # image dimensions
         h,w = img.shape[:2]

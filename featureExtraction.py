@@ -16,8 +16,10 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 class FeatureExtarction:
+  """
+    FeatureExtraction class. This class's purpose is to extract the features from the image.
+  """
 
-  # Global Features
   def variegation(self,Im: np.ndarray):
     # Split Color channels
     lesion_r, lesion_g, lesion_b = np.split(Im, 3, axis=2)

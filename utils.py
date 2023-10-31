@@ -9,34 +9,28 @@ import cv2 as cv
 import os
 from tqdm import tqdm
 import pandas as pd
-from FeatureExtraction import FeatureExtarction
-from preprocessing import Preprocessing
-
+from featureExtraction import FeatureExtarction
 
 
 # Function to read the dataset
-def read_dataset(img_size, subset):
+def read_dataset(img_size, img_path,subset):
     # Initialize vectors
     vec_img = []
     vec_labels = []
-    # Define the path to the dataset
-    path_images = os.path.join('/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/ROI/', subset)
-    # Define label-to-number mapping
-    label_to_number = {'nevus': 0, 'others': 1}
-    preprocessing = Preprocessing()
+    path_images = os.path.join(img_path, subset) # Define the path to the dataset
+    label_to_number = {'nevus': 0, 'others': 1} # Define label-to-number mapping
 
     for label, label_number in label_to_number.items():
         images_path = os.path.join(path_images, label)
         image_files = os.listdir(images_path)
 
         with tqdm(total=len(image_files), desc=f'Reading images {subset} ({label})...') as pbar:  # Initialize the progress bar
-            for file_name in image_files:
+            for file_name in image_files[0:10]:
                 image = os.path.join(images_path, file_name)
                 img = cv.imread(image)
                 if img is None:
                     print(f"Error loading image  {file_name}")
                 else:
-                    img = preprocessing._color_constancy(img)
                     resized_img = cv.resize(img, img_size)
                     vec_img.append(resized_img)
                     vec_labels.append(label_number)
@@ -44,6 +38,7 @@ def read_dataset(img_size, subset):
 
     return np.asarray(vec_img), np.asarray(vec_labels)
 
+# Function to modify the column headings
 def column_headings():
     # Define feature category names and counts
     feature_categories = {
@@ -64,6 +59,7 @@ def column_headings():
 
     return column_headings_
 
+# Function to normalise features
 def normalise_features(vec_features, vec_gt):
     features=FeatureExtarction()
     # We normalize the data
@@ -100,9 +96,10 @@ def extract_features(vec_img, vec_img_gt, subset):
 
     return normalized_features, vec_gt
 
-def load_and_extract_features(img_size, subset):
+# Function to read and extract features
+def load_and_extract_features(img_size, img_path, subset):
     # Read the dataset
-    data, data_gt = read_dataset(img_size=img_size, subset=subset)
+    data, data_gt = read_dataset(img_size=img_size,img_path=img_path, subset=subset)
     print(f"\n{subset} set: {data.shape[0]} images")
 
     # Extract features from the dataset
@@ -113,6 +110,7 @@ def load_and_extract_features(img_size, subset):
 
     return vec_features, vec_gt
 
+# Function to save features
 def save_features_to_csv(features, ground_truth, subset, base_path,img_size):
     # Save features
     features.to_csv(f'{base_path}/colour_new_features_{subset}_{img_size[0]}x{img_size[1]}.csv', index=False)
