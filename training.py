@@ -200,10 +200,9 @@ class Training:
         else:
             predictions = classifier.predict(test)
 
-        # Save predictions to a CSV file
-        df_predictions = pd.DataFrame(predictions, columns=['Predictions Test'])
-        df_predictions.to_csv(f'/Users/xavibeltranurbano/PycharmProjects/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/{self.type_training}/{self.type_training}_test_predictions.csv', index=False)
-
+        # Save predictions to an Excel file
+        df_predictions = pd.DataFrame(predictions)
+        df_predictions.to_excel(f'/Users/xavibeltranurbano/PycharmProjects/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/{self.type_training}/{self.type_training}_test_predictions.xlsx',index=False, header=False)
 
 if __name__ == "__main__":
     # Read features

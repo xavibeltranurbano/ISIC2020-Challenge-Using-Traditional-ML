@@ -16,28 +16,35 @@ def run_program():
 
     # Train data
     vec_features_train, vec_gt_train = utils.load_and_extract_features('train')
-    utils.save_features_to_csv(vec_features_train, vec_gt_train, 'train', base_path)
+    utils.save_features_to_csv(vec_features_train, ground_truth=vec_gt_train, base_path=base_path,subset='train')
 
     # Validation data
     vec_features_val, vec_gt_val = utils.load_and_extract_features('val')
-    utils.save_features_to_csv(vec_features_val, vec_gt_val, 'val', base_path)
-
-    """vec_features_train = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/features_train_256x256.csv')  # Set index=False to exclude the index column
-    vec_gt_train = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/gt_features_train_256x256.csv')  # Set index=False to exclude the index column
-    vec_features_val = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/features_val_256x256.csv')  # Set index=False to exclude the index column
-    vec_gt_val = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/gt_features_val_256x256.csv')  # Set index=False to exclude the index column
-    """
+    utils.save_features_to_csv(vec_features_val, ground_truth=vec_gt_val, base_path=base_path,subset='val')
 
     # Initialize and fit training
     training = Training(vec_features_train, vec_features_val, vec_gt_train, vec_gt_val,type_training='Multiclass', cv=5)
-    training.fit()
+    #training.fit()
 
     # Test data
     vec_features_test = utils.load_and_extract_features_test('test')
-    #vec_features_test = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/features_test_256x256.csv')  # Set index=False to exclude the index column
-    utils.save_features_to_csv(vec_features_test,subset='test', base_path=base_path)
+    utils.save_features_to_csv(vec_features_test,base_path=base_path,subset='test')
     training.predict_test(vec_features_test)
 
 
 if __name__ == "__main__":
     run_program()
+
+    """vec_features_train = pd.read_csv(
+        f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/features_train_256x256.csv')  # Set index=False to exclude the index column
+    vec_gt_train = pd.read_csv(
+        f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/gt_features_train_256x256.csv')  # Set index=False to exclude the index column
+    vec_features_val = pd.read_csv(
+        f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/features_val_256x256.csv')  # Set index=False to exclude the index column
+    vec_gt_val = pd.read_csv(
+        f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/gt_features_val_256x256.csv')  # Set index=False to exclude the index column
+    vec_features_test= pd.read_csv(
+        f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/features_test_256x256.csv')  # Set index=False to exclude the index column
+
+    
+    """

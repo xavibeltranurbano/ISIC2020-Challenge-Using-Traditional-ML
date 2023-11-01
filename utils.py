@@ -41,7 +41,7 @@ class Utils:
         if self.type_training=='Binary':
             label_to_number = {'nevus': 0, 'others': 1}  # Define label-to-number mapping
         else:
-            label_to_number = {'scc': 0, 'bcc': 1,'mel':2 } # Define label-to-number mapping
+            label_to_number = {'mel': 0, 'bcc': 1,'scc':2 } # Define label-to-number mapping
 
         for label, label_number in label_to_number.items():
             images_path = os.path.join(path_images, label)
@@ -67,7 +67,9 @@ class Utils:
         vec_img = []
         path_images = os.path.join(self.img_path, subset) # Define the path to the dataset
         image_files = os.listdir(path_images)
-
+        # Sort filenames based on numeric values
+        image_files=sorted([f for f in image_files if f.endswith('.jpg')])
+        print(image_files)
         with tqdm(total=len(image_files), desc=f'Reading images {subset} ') as pbar:  # Initialize the progress bar
             for file_name in image_files:
                 image = os.path.join(path_images, file_name)
@@ -107,13 +109,11 @@ class Utils:
     def normalise_features(self,vec_features, vec_gt=None):
         # We normalize the data
         normalized_features = self.features.feature_normalization(vec_features)
-
-        # Shuffle the rows
-        normalized_features = normalized_features.sample(frac=1, random_state=0)
-        normalized_features = normalized_features.reset_index(drop=True)
-
         if vec_gt is not None:
-            vec_gt = vec_gt.sample(frac=1, random_state=0)
+            # Shuffle the rows
+            normalized_features = normalized_features.sample(frac=1, random_state=0)
+            normalized_features = normalized_features.reset_index(drop=True)
+            vec_gt = pd.Series(vec_gt).sample(frac=1, random_state=0)
             vec_gt = vec_gt.reset_index(drop=True)
             return normalized_features, vec_gt
         else:
@@ -183,7 +183,7 @@ class Utils:
     # Function to DEAL WITH CLASS IMBALANCE
     def apply_smote_undersample(self,train_feat, train_labels):
         # Define the sampling strategy
-        sampling_strategy = {0: 2713, 1: 1993, 2: 1800}
+        sampling_strategy = {0: np.sum(np.asarray(train_labels)==0), 1: np.sum(np.asarray(train_labels)==1), 2: 2713}
 
         # SMOTE Approach
         sm = SMOTE(sampling_strategy=sampling_strategy, random_state=24)
@@ -194,3 +194,11 @@ class Utils:
         # Sample the features:
         train_feats, trains_labels = pipeline.fit_resample(train_feat, train_labels)
         return train_feats, trains_labels
+
+    if __name__ == "__main__":
+        # Read features
+        path="/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/test"
+        image_files = os.listdir(path)
+        # Remove the '.jpg' extension and sort filenames based on numeric values
+        image_files = sorted([f for f in image_files if f.endswith('.jpg')])
+        print(image_files)
