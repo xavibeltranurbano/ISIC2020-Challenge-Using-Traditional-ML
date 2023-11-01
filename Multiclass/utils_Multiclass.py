@@ -117,7 +117,7 @@ def load_and_extract_features(img_size, img_path, subset):
 def save_features_to_csv(features, ground_truth, subset, base_path,img_size):
     # Save features
     features.to_csv(f'{base_path}/features_{subset}_{img_size[0]}x{img_size[1]}.csv', index=False)
-    pd.Series(ground_truth).to_csv(f'{base_path}/features_{subset}_{img_size[0]}x{img_size[1]}.csv', index=False)
+    pd.Series(ground_truth).to_csv(f'{base_path}/gt_features_{subset}_{img_size[0]}x{img_size[1]}.csv', index=False)
 
 # Function to DEAL WITH CLASS IMBALANCE
 def apply_smote_undersample(train_feat, train_labels):
