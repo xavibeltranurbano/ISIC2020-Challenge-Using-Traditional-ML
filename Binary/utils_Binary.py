@@ -25,7 +25,7 @@ def read_dataset(img_size, img_path,subset):
         image_files = os.listdir(images_path)
 
         with tqdm(total=len(image_files), desc=f'Reading images {subset} ({label})...') as pbar:  # Initialize the progress bar
-            for file_name in image_files[0:10]:
+            for file_name in image_files:
                 image = os.path.join(images_path, file_name)
                 img = cv.imread(image)
                 if img is None:

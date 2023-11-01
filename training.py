@@ -9,13 +9,14 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.exceptions import ConvergenceWarning
-from sklearn.metrics import accuracy_score, roc_curve
+from sklearn.metrics import accuracy_score, cohen_kappa_score, balanced_accuracy_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
 import xgboost as xgb
 import warnings
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import roc_curve, auc
+
 
 class Training:
     def __init__(self,vec_train,vec_val, gt_train,gt_val,type_training,cv=2):
@@ -37,46 +38,62 @@ class Training:
               ('Random Forest',RandomForestClassifier(max_depth=30,min_samples_leaf=1, min_samples_split=5,n_estimators=300))]
           self.X=pd.concat([vec_train,vec_val],ignore_index=True)
           self.y = pd.concat([gt_train, gt_val], ignore_index=True)
-          self.thresholds=[] # We will store all the youden index
           self.type_training=type_training # Binary or Multiclass
+          if self.type_training=='Binary':
+              self.thresholds = []  # We will store all the youden index in the binary cases
+              self.results = {
+                    'XGB': {'accuracy': []},
+                    'Random Forest': {'accuracy': []},
+                    'Voting': {'accuracy': []}
+              }
+          else:
+              self.results = {
+                  'XGB': {'accuracy': [], 'kappa': [], 'balanced_accuracy': []},
+                  'Random Forest': {'accuracy': [], 'kappa': [], 'balanced_accuracy': []}
+              }
 
     def Voting(self, all_predictions, vec_gt_val):
         # Sum the predictions for each sample across classifiers
         summed_vector = np.sum(all_predictions, axis=0)
-
-        if self.type_training == 'Binary':
-            # Threshold the summed predictions
-            voting = np.where(summed_vector > 1, 1, 0)
-        else:  # Multiclass
-            # The class label is the index with the maximum summed prediction
-            voting = np.argmax(summed_vector, axis=1)
-
+        voting = np.where(summed_vector > 1, 1, 0)
         # Compute the accuracy of the voting
         accuracy = accuracy_score(np.array(vec_gt_val).ravel(), voting)
         return accuracy
 
-    def computeMetrics(self,predictions,y_val, name_classifier,results):
-        # Calculate accuracy
-        accuracy = accuracy_score(np.array(y_val).ravel(), predictions)
+    def printMeanMetrics(self):
+        print("\n------------Mean Results CV------------")
+        for classifier_name, metrics in self.results.items():
+            print(f"\n· Results for {classifier_name}:")
+            for metric_name, metric_values in metrics.items():
+                mean_value = np.mean(metric_values)
+                print(f"{metric_name.replace('_', ' ').capitalize()}: {mean_value}")
 
-        # Store the accuracy in the results dictionary
-        print(f" {name_classifier} Accuracy:", accuracy)
-        results[name_classifier].append(accuracy)
+    def printMetrics(self,name_classifier,y_val,predictions):
+        # Print metrics
+        print(f"\nMetrics for {name_classifier}:")
+        for metric_name, metric_value in self.results[name_classifier].items():
+            print(f"{metric_name.replace('_', ' ').capitalize()}: {metric_value[-1]}")
 
-        # Calculate the confusion matrix
-        confusion = confusion_matrix(np.array(y_val).ravel(), predictions)
-
-        # Print the confusion matrix
-        print("Confusion Matrix:")
-        print(confusion)
-
-        # Generate the entire classification report
+        print(f"Confusion Matrix:")
         report = classification_report(np.array(y_val).ravel(), predictions)
-
-        # Print the classification report
-        print("\nClassification Report:")
         print(report)
-        return results
+
+    def computeMetrics(self, predictions, y_val, name_classifier):
+        metrics = {}
+
+        # Calculate accuracy
+        metrics["accuracy"] = accuracy_score(np.array(y_val).ravel(), predictions)
+
+        if self.type_training == 'Multiclass':
+            metrics["kappa"] = cohen_kappa_score(np.array(y_val).ravel(), predictions)
+            metrics["balanced_accuracy"] = balanced_accuracy_score(np.array(y_val).ravel(), predictions)
+
+        # Update results dictionary
+        for metric_name, metric_value in metrics.items():
+            self.results[name_classifier][metric_name].append(metric_value)
+
+        self.printMetrics(name_classifier,y_val,predictions)
+
 
     def plotROC(self,fpr,tpr,auc_value):
         # Plotting the ROC curve
@@ -122,7 +139,7 @@ class Training:
 
         return predictions
 
-    def train_classifier(self,classifier,X_train,y_train,X_val,y_val,all_predictions,name, results):
+    def train_classifier(self,classifier,X_train,y_train,X_val,y_val,all_predictions,name):
         # Train the classifier
         classifier.fit(X_train, np.array(y_train).ravel())
         if self.type_training=='Binary':
@@ -136,36 +153,31 @@ class Training:
         all_predictions.append(predictions)
 
         # Compute metrics
-        results = self.computeMetrics(predictions, y_val, name, results)
+        results = self.computeMetrics(predictions, y_val, name)
         return all_predictions, results
 
-
     def fit(self):
-          stratified_kf = StratifiedKFold(n_splits=self.cross_val, shuffle=True,random_state=42)  # You can adjust the random_state as needed
-          results = {'XGB':[], 'Random Forest':[], 'Voting':[]}  # Dictionary to store results
-          print("\n------------Results------------")
-          n_fold=1
-          for train_index, val_index in stratified_kf.split(self.X, self.y):
-              print(f"\n·FOLD {n_fold}")
-              # Extract the samples of this fold
-              X_train, X_val = self.X.iloc[train_index], self.X.iloc[val_index]
-              y_train, y_val = self.y.iloc[train_index], self.y.iloc[val_index]
+        stratified_kf = StratifiedKFold(n_splits=self.cross_val, shuffle=True, random_state=42)
+        print("\n------------Results------------")
+        n_fold = 1
+        for train_index, val_index in stratified_kf.split(self.X, self.y):
+            print(f"\n·FOLD {n_fold}")
+            X_train, X_val = self.X.iloc[train_index], self.X.iloc[val_index]
+            y_train, y_val = self.y.iloc[train_index], self.y.iloc[val_index]
 
-              all_predictions = []
-              for name, classifier in self.classifiers:
-                  # Train the classifier and compute metrics
-                  all_predictions,results=self.train_classifier(classifier,X_train,y_train,X_val,y_val,all_predictions,name, results)
+            all_predictions = []
+            for name, classifier in self.classifiers:
+                self.train_classifier(classifier, X_train, y_train, X_val, y_val, all_predictions, name)
 
-              # We do Voting with all the previous models
-              accuracy = self.Voting(all_predictions,y_val)
-              print(f" Voting Accuracy:", accuracy)
-              results['Voting'].append(accuracy)
-              n_fold+=1
+            if self.type_training == 'Binary':
+                accuracy = self.Voting(all_predictions, y_val)
+                print(f" Voting Accuracy:", accuracy)
+                self.results['Voting']['accuracy'].append(accuracy)
 
-          # Print the results of the CV
-          print("\n------------Mean Results CV------------")
-          for name, vec in results.items():
-              print(f"{name}: {np.mean(vec)}")
+            n_fold += 1
+
+        # Compute and print mean results
+        self.printMeanMetrics()
 
     def predict_test(self, test):
         # Select the XGB classifier from the classifiers list
