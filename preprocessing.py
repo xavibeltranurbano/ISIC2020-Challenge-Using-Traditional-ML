@@ -239,7 +239,7 @@ class Preprocessing:
 
             return final_image
 
-    def preprocess_image_ROI(self, img,image_file ,plot_results):
+    def preprocess_image_ROI(self, img):
             roi_image = self._roi(img)
 
             # Apply Gaussian blur

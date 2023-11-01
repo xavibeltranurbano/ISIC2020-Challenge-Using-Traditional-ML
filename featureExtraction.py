@@ -15,7 +15,7 @@ import mahotas
 from sklearn.preprocessing import MinMaxScaler
 
 
-class FeatureExtarction:
+class FeatureExtraction:
   """
     FeatureExtraction class. This class's purpose is to extract the features from the image.
   """
@@ -141,7 +141,7 @@ class FeatureExtarction:
 
 if __name__ == "__main__":
     # Load an image for feature extraction
-    image_folder = "/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/train/nevus/nev00002.jpg"
+    image_folder = "/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Binary/train/nevus/nev00002.jpg"
     img = cv.imread(image_folder)
 
     # Create an instance of the Features class

@@ -5,7 +5,6 @@
 # -----------------------------------------------------------------------------
 
 # Import necessary libraries
-import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.exceptions import ConvergenceWarning
@@ -14,9 +13,10 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
 import xgboost as xgb
 import warnings
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import classification_report
 from sklearn.metrics import roc_curve, auc
-
+from utils import Utils
+import numpy as np
 
 class Training:
     def __init__(self,vec_train,vec_val, gt_train,gt_val,type_training,cv=2):
@@ -29,6 +29,7 @@ class Training:
                 gt_val (pd.DataFrame): Ground truth for validation data.
                 type_training (str): Type of training (e.g., "Binary", "Multiclass"). Determines the training approach.
                 cv (int, optional): Number of cross-validation folds. Defaults to 2.
+                utils(class): Class utils
           """
           self.cross_val=cv  # Number of folds
           warnings.filterwarnings("ignore", category=ConvergenceWarning)
@@ -51,6 +52,7 @@ class Training:
                   'XGB': {'accuracy': [], 'kappa': [], 'balanced_accuracy': []},
                   'Random Forest': {'accuracy': [], 'kappa': [], 'balanced_accuracy': []}
               }
+          self.utils=Utils()
 
     def Voting(self, all_predictions, vec_gt_val):
         # Sum the predictions for each sample across classifiers
@@ -151,7 +153,6 @@ class Training:
             predictions = classifier.predict(X_val)
 
         all_predictions.append(predictions)
-
         # Compute metrics
         results = self.computeMetrics(predictions, y_val, name)
         return all_predictions, results
@@ -164,6 +165,8 @@ class Training:
             print(f"\n·FOLD {n_fold}")
             X_train, X_val = self.X.iloc[train_index], self.X.iloc[val_index]
             y_train, y_val = self.y.iloc[train_index], self.y.iloc[val_index]
+            if self.type_training=='Multiclass': # We balance the data
+                X_train, y_train = self.utils.apply_smote_undersample(X_train, y_train)
 
             all_predictions = []
             for name, classifier in self.classifiers:
@@ -182,6 +185,9 @@ class Training:
     def predict_test(self, test):
         # Select the XGB classifier from the classifiers list
         classifier = [clf for name, clf in self.classifiers if name == 'XGB'][0]
+        if self.type_training=='Multiclass':
+            # Balance the data
+            self.X,self.y=self.utils.apply_smote_undersample(self.X,self.y)
 
         # Train the classifier using the entire dataset
         classifier.fit(self.X, np.array(self.y).ravel())
@@ -201,10 +207,10 @@ class Training:
 
 if __name__ == "__main__":
     # Read features
-    vec_features_train = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/features/new_features_train_256x256.csv')  # Set index=False to exclude the index column
-    vec_gt_train = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/features/new_gt_train_256x256.csv')  # Set index=False to exclude the index column
-    vec_features_val = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/features/new_features_val_256x256.csv')  # Set index=False to exclude the index column
-    vec_gt_val = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/BINARY/features/new_gt_val_256x256.csv')  # Set index=False to exclude the index column
+    vec_features_train = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Binary/features/new_features_train_256x256.csv')  # Set index=False to exclude the index column
+    vec_gt_train = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Binary/features/new_gt_train_256x256.csv')  # Set index=False to exclude the index column
+    vec_features_val = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Binary/features/new_features_val_256x256.csv')  # Set index=False to exclude the index column
+    vec_gt_val = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Binary/features/new_gt_val_256x256.csv')  # Set index=False to exclude the index column
 
     # Start training the model
     training=Training(vec_features_train,vec_features_val,vec_gt_train,vec_gt_val, 'Binary',cv=5)
