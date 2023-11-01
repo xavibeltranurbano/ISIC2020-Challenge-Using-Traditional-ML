@@ -186,15 +186,17 @@ class Training:
         # Train the classifier using the entire dataset
         classifier.fit(self.X, np.array(self.y).ravel())
 
-        # Make predictions on the test set
-        prob_predictions = classifier.predict_proba(test)[:, 1]
-
-        # Binarize probabilities using the mean threshold (Youden Index) from cross-validation
-        predictions = np.where(prob_predictions > np.mean(self.thresholds), 1, 0)
+        if self.type_training=='Binary':
+            # Make predictions on the test set
+            prob_predictions = classifier.predict_proba(test)[:, 1]
+            # Binarize probabilities using the mean threshold (Youden Index) from cross-validation
+            predictions = np.where(prob_predictions > np.mean(self.thresholds), 1, 0)
+        else:
+            predictions = classifier.predict(test)
 
         # Save predictions to a CSV file
         df_predictions = pd.DataFrame(predictions, columns=['Predictions Test'])
-        df_predictions.to_csv(f'/Users/xavibeltranurbano/PycharmProjects/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/Binary/{self.type_training}_test_predictions.csv', index=False)
+        df_predictions.to_csv(f'/Users/xavibeltranurbano/PycharmProjects/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/{self.type_training}/{self.type_training}_test_predictions.csv', index=False)
 
 
 if __name__ == "__main__":
