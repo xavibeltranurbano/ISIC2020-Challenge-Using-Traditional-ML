@@ -121,7 +121,7 @@ class Utils:
 
 
     # Function to extract features
-    def extract_features(self,vec_img, subset, vec_img_gt=None):
+    def extract_features(self,vec_img, vec_img_gt=None,subset=None):
         vec_features = []
         vec_gt = []
 
