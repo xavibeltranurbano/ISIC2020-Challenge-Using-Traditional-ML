@@ -196,6 +196,7 @@ class Training:
             # Make predictions on the test set
             prob_predictions = classifier.predict_proba(test)[:, 1]
             # Binarize probabilities using the mean threshold (Youden Index) from cross-validation
+            print(f"Threshold: {np.mean(self.thresholds)}")
             predictions = np.where(prob_predictions > np.mean(self.thresholds), 1, 0)
         else:
             predictions = classifier.predict(test)
