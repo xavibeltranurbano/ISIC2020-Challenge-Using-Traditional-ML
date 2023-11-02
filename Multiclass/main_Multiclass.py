@@ -24,7 +24,7 @@ def run_program():
 
     # Initialize and fit training
     training = Training(vec_features_train, vec_features_val, vec_gt_train, vec_gt_val,type_training='Multiclass', cv=5)
-    #training.fit()
+    training.fit()
 
     # Test data
     vec_features_test = utils.load_and_extract_features_test('test')
