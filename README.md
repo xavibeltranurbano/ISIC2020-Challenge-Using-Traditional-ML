@@ -9,13 +9,15 @@ Program Files
 
 ```
 .
-├── dataset             # Not available in the git repository due to large file size.
+├── dataset               # Not available in the git repository due to large file size.
 ├── preprocessing.py       
 ├── featureExtraction.py           
 ├── training.py
 ├── utils.py
 ├── main_Binary.py
 └── main_Multiclass.py
+
+```
 
 Project Methodology and Result
 ============
@@ -30,9 +32,9 @@ Our proposed classification approach was implemented and evaluated on the ISIC S
 ![image](https://github.com/xavibeltranurbano/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/assets/21214562/97a73acd-ea51-4d6e-b085-91061b54fbdb)
 
 ## References
-[^1]: https://github.com/hl0d0w1g/skin_lesion_segmentation/blob/main/segmentation.py
-[^2]: - https://www.sciencedirect.com/science/article/abs/pii/S0031320321001813
-[3] - https://machinelearningmastery.com/smote-oversampling-for-imbalanced-classification/
+[1] https://github.com/hl0d0w1g/skin_lesion_segmentation/blob/main/segmentation.py
+[2] https://www.sciencedirect.com/science/article/abs/pii/S0031320321001813
+[3] https://machinelearningmastery.com/smote-oversampling-for-imbalanced-classification/
 [4] https://imbalanced-learn.org/stable/references/generated/imblearn.under_sampling.RandomUnderSampler.html
 [5] https://ieeexplore.ieee.org/document/6866131
 [6] https://github.com/nickshawn/Shades_of_Gray-color_constancy_transformation/blob/master/color_constancy.py
