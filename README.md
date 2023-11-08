@@ -61,3 +61,7 @@ Our proposed classification approach was implemented and evaluated on the ISIC S
 [9] https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
 
 [10] https://xgboost.readthedocs.io/en/stable/python/python_intro.html
+
+[11] Kalwa, U., Legner, C., Kong, T., & Pandey, S. (2019). Skin Cancer Diagnostics with an All-Inclusive Smartphone Application. Symmetry, 11(6), 790. https://doi.org/10.3390/sym11060790
+
+[12] Faziloglu, Y., Stanley, R. J., Moss, R. H., Stoecker, W. V., & McLean, R. P. (2003). Colour histogram analysis for melanoma discrimination in clinical images. Skin Research and Technology : Official Journal of International Society for Bioengineering and the Skin (ISBS) [and] International Society for Digital Imaging of Skin (ISDIS) [and] International Society for Skin Imaging (ISSI), 9(2), 147.
