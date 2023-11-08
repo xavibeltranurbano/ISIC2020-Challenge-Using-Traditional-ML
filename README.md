@@ -7,6 +7,8 @@ Xavi Beltran Urbano, Muhammad Zain Amin
 Program Files
 ============
 
+```
+.
 ├── dataset             # Not available in the git repository due to large file size.
 ├── preprocessing.py       
 ├── featureExtraction.py           
@@ -17,18 +19,15 @@ Program Files
 
 Project Methodology and Result
 ============
-The proposed approach for skin lesion classification using machine learning consists of four major steps, which are image pre-processing, data sampling, feature extraction and, classification. Sklearn library was used for obtaining classification scores using a 5-fold cross-validation for both binary and multiclass classification tasks. The SMOTE approach helps as it is robust to class imbalance. 
+The proposed approach for skin lesion classification using machine learning consists of four major steps, which are image pre-processing, data sampling, feature extraction and, classification. Sklearn library was used for obtaining classification scores using a 5-fold cross-validation for both binary and multiclass classification tasks. The SMOTE approach helps as it is robust to class imbalance.
 
-<p align="center">
-  ![image](https://github.com/xavibeltranurbano/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/assets/21214562/0400486c-9e6e-45f3-b06d-f6e8c77754e2)
-</p>
+![image](https://github.com/xavibeltranurbano/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/assets/21214562/03164afe-964d-4b18-83ab-34d0b4354631)
+![image](https://github.com/xavibeltranurbano/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/assets/21214562/fd3f0802-aecc-4005-a6dd-38170b0952cb)
+![image](https://github.com/xavibeltranurbano/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/assets/21214562/9119c83e-b139-43cb-bc9a-007c9329e09f)
 
 Our proposed classification approach was implemented and evaluated on the ISIC Skin Lesion dataset, containing melanoma, bcc, and scc lesions. Various features were extracted from preprocessed images and used for training the machine learning algorithms. In general, the proposed CAD system achieves promising results in both the binary and multiclass classification tasks. The results are given below:-
 
-
-
-
-
+![image](https://github.com/xavibeltranurbano/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/assets/21214562/97a73acd-ea51-4d6e-b085-91061b54fbdb)
 
 ## References
 [^1]: https://github.com/hl0d0w1g/skin_lesion_segmentation/blob/main/segmentation.py
