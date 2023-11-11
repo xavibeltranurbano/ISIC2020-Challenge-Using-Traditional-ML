@@ -17,6 +17,7 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import roc_curve, auc
 from utils import Utils
 import numpy as np
+import time
 
 class Training:
     def __init__(self,vec_train,vec_val, gt_train,gt_val,type_training,cv=2):
@@ -52,6 +53,9 @@ class Training:
                   'XGB': {'accuracy': [], 'kappa': [], 'balanced_accuracy': []},
                   'Random Forest': {'accuracy': [], 'kappa': [], 'balanced_accuracy': []}
               }
+          self.computationalTime = {
+              'XGB': [],
+            'Random Forest':[]}
           self.utils=Utils()
 
     def Voting(self, all_predictions, vec_gt_val):
@@ -59,8 +63,8 @@ class Training:
         summed_vector = np.sum(all_predictions, axis=0)
         voting = np.where(summed_vector > 1, 1, 0)
         # Compute the accuracy of the voting
-        accuracy = accuracy_score(np.array(vec_gt_val).ravel(), voting)
-        return accuracy
+        self.computeMetrics(voting,np.array(vec_gt_val).ravel(),'Voting')
+
 
     def printMeanMetrics(self):
         print("\n------------Mean Results CV------------")
@@ -69,6 +73,9 @@ class Training:
             for metric_name, metric_values in metrics.items():
                 mean_value = np.mean(metric_values)
                 print(f"{metric_name.replace('_', ' ').capitalize()}: {mean_value}")
+            if classifier_name!='Voting':
+                print(f"Computational Time: {np.mean(self.computationalTime[classifier_name])}")
+
 
     def printMetrics(self,name_classifier,y_val,predictions):
         # Print metrics
@@ -143,6 +150,7 @@ class Training:
 
     def train_classifier(self,classifier,X_train,y_train,X_val,y_val,all_predictions,name):
         # Train the classifier
+        startTime=time.time()
         classifier.fit(X_train, np.array(y_train).ravel())
         if self.type_training=='Binary':
             # Make predictions on the validation set
@@ -151,7 +159,7 @@ class Training:
             predictions = self.binarizeProbabilities(prob_predictions, y_val)
         else:
             predictions = classifier.predict(X_val)
-
+        self.computationalTime[name].append(time.time()-startTime)
         all_predictions.append(predictions)
         # Compute metrics
         results = self.computeMetrics(predictions, y_val, name)
@@ -173,9 +181,7 @@ class Training:
                 self.train_classifier(classifier, X_train, y_train, X_val, y_val, all_predictions, name)
 
             if self.type_training == 'Binary':
-                accuracy = self.Voting(all_predictions, y_val)
-                print(f" Voting Accuracy:", accuracy)
-                self.results['Voting']['accuracy'].append(accuracy)
+                self.Voting(all_predictions, y_val)
 
             n_fold += 1
 
@@ -205,15 +211,5 @@ class Training:
         df_predictions = pd.DataFrame(predictions)
         df_predictions.to_excel(f'/Users/xavibeltranurbano/PycharmProjects/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/{self.type_training}/{self.type_training}_test_predictions.xlsx',index=False, header=False)
 
-if __name__ == "__main__":
-    # Read features
-    vec_features_train = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Binary/features/new_features_train_256x256.csv')  # Set index=False to exclude the index column
-    vec_gt_train = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Binary/features/new_gt_train_256x256.csv')  # Set index=False to exclude the index column
-    vec_features_val = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Binary/features/new_features_val_256x256.csv')  # Set index=False to exclude the index column
-    vec_gt_val = pd.read_csv(f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Binary/features/new_gt_val_256x256.csv')  # Set index=False to exclude the index column
 
-    # Start training the model
-    training=Training(vec_features_train,vec_features_val,vec_gt_train,vec_gt_val, 'Binary',cv=5)
-    training.fit()
-    training.predict_test(vec_features_val)
 

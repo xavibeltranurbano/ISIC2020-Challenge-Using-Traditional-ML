@@ -139,13 +139,3 @@ class FeatureExtraction:
 
       return image_feature_df
 
-if __name__ == "__main__":
-    # Load an image for feature extraction
-    image_folder = "/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Binary/train/nevus/nev00002.jpg"
-    img = cv.imread(image_folder)
-
-    # Create an instance of the Features class
-    features = FeatureExtarction()
-
-    # Extract and print color features
-    vec_features = features.extract_all(img)

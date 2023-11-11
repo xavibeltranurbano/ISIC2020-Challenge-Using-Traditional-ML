@@ -3,6 +3,8 @@
 # Author: Xavier Beltran Urbano and Zain Muhammad
 # Date Created: 17-10-2023
 # -----------------------------------------------------------------------------
+import os
+from random import random
 
 # Import libraries
 import numpy as np
@@ -139,50 +141,44 @@ class Preprocessing:
         plt.figure(figsize=(14, 4))
 
         # Display the original image
-        plt.subplot(1, 7, 1)
+        plt.subplot(1, 6, 1)
         plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB))
         plt.title(f'Original: {image_file}', fontsize=5)
         plt.axis('off')
 
         # Display the padded image
-        plt.subplot(1, 7, 2)
+        plt.subplot(1, 6, 2)
         plt.imshow(cv.cvtColor(hair_removed_image, cv.COLOR_BGR2RGB))
         plt.title('Step 1: Hair Removal', fontsize=5)
         plt.axis('off')
 
         # Display the eroded mask
-        plt.subplot(1, 7, 3)
-        plt.imshow(cn_hair_removed_image, cmap='binary')
+        plt.subplot(1, 6, 3)
+        plt.imshow(cv.cvtColor(cn_hair_removed_image, cv.COLOR_BGR2RGB))
         plt.title('Step 2: Color Normalization', fontsize=5)
         plt.axis('off')
 
         # Display the ROI image
-        plt.subplot(1, 7, 4)
+        plt.subplot(1, 6, 4)
         plt.imshow(cv.cvtColor(roi_image, cv.COLOR_BGR2RGB))
         plt.title('Step 3: ROI Image', fontsize=5)
         plt.axis('off')
 
         # Display the eroded mask
-        plt.subplot(1, 7, 5)
-        plt.imshow(255-segmented_image, cmap='binary')
-        plt.title('Step 4: Padding Image', fontsize=5)
-        plt.axis('off')
-
-        # Display the eroded mask
-        plt.subplot(1, 7, 6)
+        plt.subplot(1, 6, 5)
         plt.imshow(cv.cvtColor(cropped_mask_3_channels, cv.COLOR_BGR2RGB))
-        plt.title('Step 5: Binary Mask', fontsize=5)
+        plt.title('Step 4: Padding + Binary Mask', fontsize=5)
         plt.axis('off')
 
         # Display the final image
-        plt.subplot(1, 7, 7)
+        plt.subplot(1, 6, 6)
         plt.imshow(cv.cvtColor(final_image, cv.COLOR_BGR2RGB))
         plt.title('Final Image', fontsize=5)
         plt.axis('off')
 
         # Adjust the spacing between subplots
         plt.tight_layout()
-
+        plt.savefig("preprocessing.png")
         # Show the figure
         plt.show()
 
@@ -281,20 +277,3 @@ class Preprocessing:
             final_image = 255 - (cropped_mask_3_channels * roi_image)
 
             return final_image
-
-# Usage
-if __name__ == "__main__":
-    """image_folder = "/content/drive/MyDrive/Skin_Lesion_Dataset/Binary_Challenge/train/nevus/"
-    preprocessing = Preprocessing(image_folder)
-    # Get a list of image files in the folder
-    image_files = os.listdir(image_folder)
-    # Shuffle the list of image files
-    random.shuffle(image_files)
-    # Limit the number of images to 50 if there are more
-    num_images_to_process = min(50, len(image_files))
-    # Choose the first image
-    image_file = image_files[0]
-    image_path = os.path.join(image_folder, image_file)
-    # Read image
-    img = cv.imread(image_path)
-    preprocessing.preprocess_image(img,image_file, plot_results=True)"""

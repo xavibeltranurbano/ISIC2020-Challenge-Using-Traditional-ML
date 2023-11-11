@@ -69,7 +69,6 @@ class Utils:
         image_files = os.listdir(path_images)
         # Sort filenames based on numeric values
         image_files=sorted([f for f in image_files if f.endswith('.jpg')])
-        print(image_files)
         with tqdm(total=len(image_files), desc=f'Reading images {subset} ') as pbar:  # Initialize the progress bar
             for file_name in image_files:
                 image = os.path.join(path_images, file_name)
@@ -106,44 +105,40 @@ class Utils:
         return column_headings_
 
     # Function to normalise features
-    def normalise_features(self,vec_features, vec_gt=None):
-        # We normalize the data
-        normalized_features = self.features.feature_normalization(vec_features)
-        if vec_gt is not None:
+    def normalise_features(self, vec_features, vec_gt=None):
+        # We normalize the data using min-max normalization
+        if vec_gt is None:
+            normalized_features = (vec_features - self.min_val) / (self.max_val - self.min_val)
+            return normalized_features
+        else:
+            self.min_val = vec_features.min()
+            self.max_val = vec_features.max()
+            normalized_features = (vec_features - self.min_val) / (self.max_val - self.min_val)
+            normalized_features.fillna(0, inplace=True)  # This will replace all NaNs with 0
             # Shuffle the rows
             normalized_features = normalized_features.sample(frac=1, random_state=0)
             normalized_features = normalized_features.reset_index(drop=True)
             vec_gt = pd.Series(vec_gt).sample(frac=1, random_state=0)
             vec_gt = vec_gt.reset_index(drop=True)
+
             return normalized_features, vec_gt
-        else:
-            return normalized_features
 
 
     # Function to extract features
-    def extract_features(self,vec_img, vec_img_gt=None,subset=None):
+    def extract_features(self,vec_img,subset=None):
         vec_features = []
         vec_gt = []
 
         with tqdm(total=len(vec_img), desc=f'{subset}: Extracting features... ') as pbar:  # Initialize the progress bar
             for i in range(len(vec_img)):
                 vec_features.append(self.features.extract_all(vec_img[i]))
-                if vec_img_gt is not None:  # If ground truth is provided
-                    vec_gt.append(vec_img_gt[i])
                 pbar.update(1)  # Update the progress bar
 
         vec_features = pd.concat(vec_features)
 
         # Set meaningful column headings
         vec_features.columns = self.column_headings()
-
-        # We normalize the data
-        if vec_img_gt is not None:
-            normalized_features, vec_gt = self.normalise_features(vec_features, vec_gt)
-            return normalized_features, vec_gt
-        else:
-            normalized_features = self.normalise_features(vec_features)
-            return normalized_features
+        return vec_features
 
     # Function to read and extract features
     def load_and_extract_features(self, subset):
@@ -152,10 +147,10 @@ class Utils:
         print(f"\n{subset} set: {data.shape[0]} images")
 
         # Extract features from the dataset
-        vec_features, vec_gt = self.extract_features(data, data_gt, subset=subset)
+        vec_features = self.extract_features(data, subset=subset)
 
         # Normalise features
-        vec_features, vec_gt = self.normalise_features(vec_features, vec_gt)
+        vec_features, vec_gt = self.normalise_features(vec_features, data_gt)
 
         return vec_features, vec_gt
 
@@ -195,10 +190,3 @@ class Utils:
         train_feats, trains_labels = pipeline.fit_resample(train_feat, train_labels)
         return train_feats, trains_labels
 
-    if __name__ == "__main__":
-        # Read features
-        path="/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/test"
-        image_files = os.listdir(path)
-        # Remove the '.jpg' extension and sort filenames based on numeric values
-        image_files = sorted([f for f in image_files if f.endswith('.jpg')])
-        print(image_files)

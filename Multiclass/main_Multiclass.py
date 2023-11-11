@@ -34,17 +34,3 @@ def run_program():
 
 if __name__ == "__main__":
     run_program()
-
-    """vec_features_train = pd.read_csv(
-        f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/features_train_256x256.csv')  # Set index=False to exclude the index column
-    vec_gt_train = pd.read_csv(
-        f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/gt_features_train_256x256.csv')  # Set index=False to exclude the index column
-    vec_features_val = pd.read_csv(
-        f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/features_val_256x256.csv')  # Set index=False to exclude the index column
-    vec_gt_val = pd.read_csv(
-        f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/gt_features_val_256x256.csv')  # Set index=False to exclude the index column
-    vec_features_test= pd.read_csv(
-        f'/Users/xavibeltranurbano/Desktop/MAIA/GIRONA/CAD/MACHINE LEARNING/Multiclass/features/features_test_256x256.csv')  # Set index=False to exclude the index column
-
-    
-    """
