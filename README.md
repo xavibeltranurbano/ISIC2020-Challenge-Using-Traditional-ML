@@ -1,8 +1,8 @@
-# CAD Project: A SKIN LESION CLASSIFICATION APPROACH WITH MACHINE LEARNING
+# A Skin Lesion Classification Approach Using Traditional Machine leanring 
 
-Contributors:
+**Authors:** Xavi Beltran Urbano, Muhammad Zain Amin
 
-Xavi Beltran Urbano, Muhammad Zain Amin
+**Dataset:** [ISIC 2020](https://challenge2020.isic-archive.com)
 
 Program Files
 ============
@@ -36,7 +36,7 @@ The proposed approach for skin lesion classification using machine learning cons
 ![image](https://github.com/xavibeltranurbano/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/assets/21214562/03164afe-964d-4b18-83ab-34d0b4354631)
 ![image](https://github.com/xavibeltranurbano/ISIC-Challenge-A-Conventional-Skin-Lesion-Classification-Approach/assets/21214562/61cbd8ac-0de0-4522-bd0a-4fd59d148eee)
 
-Our proposed classification approach was implemented and evaluated on the ISIC Skin Lesion dataset, containing melanoma, bcc, and scc lesions. Various features were extracted from preprocessed images and used for training the machine learning algorithms. In general, the proposed CAD system achieves promising results in both the binary and multiclass classification tasks. The results are given below:-
+Our proposed classification approach was implemented and evaluated on the ISIC Skin Lesion dataset, containing melanoma, bcc, and scc lesions. Various features were extracted from preprocessed images and used for training the machine learning algorithms. In general, the proposed CAD system achieves promising results in both the binary and multiclass classification tasks. The results are given below:
 
 
 
