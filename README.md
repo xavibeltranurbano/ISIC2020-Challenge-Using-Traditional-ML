@@ -1,4 +1,4 @@
-# A Skin Lesion Classification Approach Using Traditional Machine leanring 
+# A Skin Lesion Classification Approach Using Traditional Machine Learning 
 
 **Authors:** Xavi Beltran Urbano, Muhammad Zain Amin
 
